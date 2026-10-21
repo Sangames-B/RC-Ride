@@ -1,0 +1,1777 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>A Sweet Ride to My Heart ❤️</title>
+  <meta name="description" content="A romantic mobile RC car mini-game made with love.">
+  <meta name="theme-color" content="#FFD1DC">
+  <style>
+    /* ── RESET ── */
+    *, *::before, *::after {
+      box-sizing: border-box; margin: 0; padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+    :root {
+      --bg: linear-gradient(145deg,#FFF0F5 0%,#FFE4E8 45%,#F5E8FF 100%);
+      --pink-blush:   #FFE4E8;
+      --pink-soft:    #FFD1DC;
+      --pink-primary: #FF5376;
+      --pink-deep:    #E03157;
+      --mint-light:   #E6F9F0;
+      --mint-primary: #38A169;
+      --vanilla-cream:#FFF9E6;
+      --vanilla-pri:  #D97706;
+      --text-main:    #332128;
+      --text-muted:   #7E636D;
+      --card-border:  rgba(255,182,193,0.45);
+      --shadow-sm:    0 4px 12px rgba(255,105,140,0.08);
+      --shadow-md:    0 8px 24px rgba(255,105,140,0.14);
+      --shadow-lg:    0 16px 36px rgba(255,105,140,0.22);
+      --r-sm:12px; --r-md:18px; --r-lg:26px; --r-full:9999px;
+    }
+    html,body {
+      width:100%; height:100%;
+      min-height:100vh; min-height:100dvh;
+      overflow-x:hidden;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      color:var(--text-main);
+      background:var(--bg); background-attachment:fixed;
+      user-select:none; -webkit-user-select:none;
+    }
+
+    /* ── APP CONTAINER ── */
+    #app {
+      width:100%; max-width:480px; margin:0 auto;
+      min-height:100vh; min-height:100dvh;
+      display:flex; flex-direction:column;
+      position:relative; background:var(--bg);
+      box-shadow:0 0 60px rgba(255,105,140,0.14);
+      overflow:hidden;
+    }
+
+    /* ── TOP BAR ── */
+    #top-bar {
+      display:flex; align-items:center; justify-content:space-between;
+      padding:10px 16px;
+      padding-top:max(10px,env(safe-area-inset-top));
+      height:52px; flex-shrink:0;
+      background:rgba(255,255,255,0.88);
+      backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);
+      border-bottom:1px solid var(--card-border); z-index:50;
+    }
+    .brand { font-size:1rem; font-weight:800; color:var(--pink-deep);
+      letter-spacing:-0.02em; display:flex; align-items:center; gap:6px; }
+    .bar-actions { display:flex; align-items:center; gap:8px; }
+    .icon-btn {
+      min-width:44px; min-height:44px; padding:6px 10px;
+      border-radius:var(--r-full); border:1.5px solid var(--card-border);
+      background:#fff; color:var(--text-main); font-size:1rem; cursor:pointer;
+      display:inline-flex; align-items:center; justify-content:center;
+      transition:transform .15s,background .15s; touch-action:manipulation;
+    }
+    .icon-btn:active { transform:scale(0.91); background:var(--pink-blush); }
+
+    /* ── SCREENS ── */
+    .screen {
+      display:none; flex-direction:column; flex:1;
+      width:100%; position:relative; overflow:hidden;
+    }
+    .screen.active {
+      display:flex;
+      animation:fadeUp .32s cubic-bezier(0.16,1,0.3,1);
+    }
+    @keyframes fadeUp {
+      from{opacity:0;transform:translateY(8px)}
+      to{opacity:1;transform:translateY(0)}
+    }
+    @media(prefers-reduced-motion:reduce){.screen.active{animation:none}}
+
+    /* ── FLOATING HEARTS ── */
+    #hearts-bg{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:1;}
+    .fheart{position:absolute;font-size:1.2rem;color:rgba(255,105,140,.20);
+      animation:floatUp 12s linear infinite;}
+    @keyframes floatUp{
+      0%{transform:translateY(110vh) scale(.8) rotate(0deg);opacity:0}
+      10%{opacity:.9} 90%{opacity:.9}
+      100%{transform:translateY(-10vh) scale(1.3) rotate(50deg);opacity:0}
+    }
+    @media(prefers-reduced-motion:reduce){.fheart{animation:none;opacity:0}}
+
+    /* ── BUTTONS ── */
+    .btn-primary {
+      width:100%; min-height:54px; padding:14px 24px;
+      background:linear-gradient(135deg,#FF6B8B 0%,#FF3D6B 100%);
+      color:#fff; font-size:1.05rem; font-weight:800;
+      border:none; border-radius:var(--r-md);
+      box-shadow:0 8px 24px rgba(255,61,107,.38);
+      cursor:pointer; display:flex; align-items:center; justify-content:center;
+      gap:8px; letter-spacing:.01em;
+      transition:transform .15s,box-shadow .15s; touch-action:manipulation;
+    }
+    .btn-primary:active{transform:scale(.96);box-shadow:0 4px 12px rgba(255,61,107,.3)}
+    .btn-secondary {
+      width:100%; min-height:48px; padding:12px 20px;
+      background:#fff; color:var(--pink-deep); font-size:.95rem; font-weight:700;
+      border:2px solid var(--pink-soft); border-radius:var(--r-md); cursor:pointer;
+      display:flex; align-items:center; justify-content:center; gap:6px;
+      transition:background .15s,transform .15s; touch-action:manipulation;
+    }
+    .btn-secondary:active{background:var(--pink-blush);transform:scale(.97)}
+
+    /* ── HERO ── */
+    #s-hero{padding:20px 20px 28px;justify-content:space-between;
+      align-items:center;text-align:center;z-index:2;overflow-y:auto;}
+    .hero-body{display:flex;flex-direction:column;align-items:center;
+      gap:14px;margin:auto 0;max-width:380px;padding:8px 0;}
+    .badge{font-size:.82rem;font-weight:700;color:var(--pink-deep);
+      background:rgba(255,255,255,.92);padding:5px 14px;
+      border-radius:var(--r-full);border:1.5px solid var(--card-border);
+      box-shadow:var(--shadow-sm);}
+    .hero-title{font-size:clamp(1.5rem,5vw,2rem);line-height:1.2;
+      font-weight:800;color:var(--text-main);letter-spacing:-.03em;text-wrap:balance;}
+    .hero-sub{font-size:1rem;line-height:1.55;color:var(--text-muted);}
+    .hero-car{width:180px;height:118px;margin:6px 0;
+      filter:drop-shadow(0 12px 18px rgba(255,75,114,.22));
+      animation:carBob 2.8s ease-in-out infinite;}
+    @keyframes carBob{0%,100%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(-9px) rotate(-1.5deg)}}
+    @media(prefers-reduced-motion:reduce){.hero-car{animation:none}}
+    .hero-hint{font-size:.88rem;font-weight:600;color:var(--pink-deep);}
+    .hero-footer{width:100%;display:flex;flex-direction:column;align-items:center;gap:10px;}
+
+    /* ── GAME ── */
+    #s-game{flex-direction:column;overflow:hidden;}
+    #game-hud{display:flex;align-items:center;justify-content:space-between;
+      padding:7px 12px;background:rgba(255,255,255,.92);
+      border-bottom:1px solid var(--card-border);flex-shrink:0;gap:8px;}
+    #hud-title{font-size:.82rem;font-weight:800;color:var(--text-main);white-space:nowrap;}
+    #scoop-pills{display:flex;gap:6px;align-items:center;flex-wrap:nowrap;}
+    .spill{display:flex;align-items:center;gap:3px;padding:3px 8px;
+      border-radius:var(--r-full);font-size:.72rem;font-weight:700;
+      background:#F3F4F6;color:#9CA3AF;border:1px solid #E5E7EB;
+      transition:all .3s cubic-bezier(0.16,1,0.3,1);white-space:nowrap;}
+    .spill.mint.got{background:var(--mint-light);color:var(--mint-primary);border-color:#A7F3D0}
+    .spill.strawberry.got{background:#FFE4E8;color:var(--pink-primary);border-color:#FECDD3}
+    .spill.vanilla.got{background:var(--vanilla-cream);color:var(--vanilla-pri);border-color:#FDE68A}
+    #game-toast{position:absolute;top:60px;left:50%;transform:translateX(-50%);
+      background:rgba(255,255,255,.96);border:1.5px solid var(--pink-soft);
+      border-radius:var(--r-full);padding:8px 18px;font-size:.82rem;font-weight:700;
+      color:var(--pink-deep);white-space:nowrap;z-index:20;
+      box-shadow:var(--shadow-sm);pointer-events:none;
+      animation:toastIn .4s ease,toastOut .4s ease 2.5s forwards;}
+    @keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(-8px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+    @keyframes toastOut{from{opacity:1}to{opacity:0}}
+    @media(prefers-reduced-motion:reduce){#game-toast{animation:none}}
+    #canvas-wrap{flex:1;min-height:0;display:flex;align-items:center;
+      justify-content:center;width:100%;position:relative;}
+    #gameCanvas{display:block;width:100%;height:100%;max-height:460px;
+      touch-action:none;border-radius:var(--r-md);box-shadow:var(--shadow-md);
+      border:2px solid #FFD9E2;background:#FDF8F6;}
+    #controls{display:flex;align-items:center;justify-content:space-between;
+      padding:8px 12px;padding-bottom:max(8px,env(safe-area-inset-bottom));
+      flex-shrink:0;gap:12px;touch-action:none;}
+    .ctrl-cluster{display:flex;align-items:center;gap:10px;}
+    .ctrl-btn{width:58px;height:58px;border-radius:var(--r-full);
+      background:#fff;border:2px solid var(--pink-soft);color:var(--pink-deep);
+      font-size:1.3rem;font-weight:900;display:flex;flex-direction:column;
+      align-items:center;justify-content:center;
+      box-shadow:0 5px 14px rgba(255,105,140,.18);cursor:pointer;
+      touch-action:none;user-select:none;-webkit-user-select:none;
+      transition:transform .08s,background .08s,border-color .08s;-webkit-touch-callout:none;}
+    .ctrl-btn .lbl{font-size:.62rem;font-weight:800;margin-top:-2px;
+      color:var(--text-muted);letter-spacing:.03em;}
+    .ctrl-btn.pressed,.ctrl-btn:active{transform:scale(.89);background:#FFE4E8;
+      border-color:var(--pink-primary);box-shadow:0 2px 6px rgba(255,83,118,.3)}
+    .ctrl-btn.drive{width:66px;height:66px;
+      background:linear-gradient(135deg,#FFF0F3 0%,#fff 100%);border-color:var(--pink-primary);}
+
+    /* ── MODAL OVERLAY ── */
+    .modal-overlay{position:fixed;inset:0;background:rgba(28,8,16,.62);
+      backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px);
+      display:none;align-items:center;justify-content:center;padding:20px;z-index:200;}
+    .modal-overlay.open{display:flex;animation:mfadeIn .25s cubic-bezier(0.16,1,0.3,1)}
+    @keyframes mfadeIn{from{opacity:0;transform:scale(.92)}to{opacity:1;transform:scale(1)}}
+    @media(prefers-reduced-motion:reduce){.modal-overlay.open{animation:none}}
+    .modal-card{width:100%;max-width:360px;background:#fff;border-radius:var(--r-lg);
+      padding:24px 20px;box-shadow:0 24px 56px rgba(0,0,0,.28);
+      border:2px solid var(--pink-soft);text-align:center;position:relative;overflow:hidden;}
+    .modal-icon{width:72px;height:72px;margin:0 auto 12px;}
+    .modal-tag{display:inline-block;font-size:.72rem;font-weight:800;
+      text-transform:uppercase;letter-spacing:.07em;color:var(--pink-deep);
+      background:var(--pink-blush);padding:4px 12px;border-radius:var(--r-full);margin-bottom:8px;}
+    .modal-title{font-size:1.35rem;font-weight:800;color:var(--text-main);margin-bottom:12px;}
+    .modal-msg{font-size:1rem;line-height:1.6;color:#4A333B;background:#FFF7F9;
+      border:1px dashed #FFCCD5;border-radius:var(--r-md);padding:14px 12px;
+      margin-bottom:18px;font-style:italic;position:relative;}
+    .modal-msg::before{content:"\201C";font-size:1.6rem;color:var(--pink-primary);
+      display:block;line-height:.8;margin-bottom:4px;}
+    .modal-msg::after{content:"\201D";font-size:1.6rem;color:var(--pink-primary);
+      display:block;line-height:.8;margin-top:4px;}
+
+    /* ── FINALE ── */
+    #s-finale{padding:20px 18px 28px;overflow-y:auto;text-align:center;z-index:2;}
+    #finale-canvas{position:absolute;inset:0;pointer-events:none;z-index:1;width:100%;height:100%;}
+    .finale-inner{position:relative;z-index:2;}
+    .finale-title{font-size:clamp(1.5rem,6vw,1.9rem);font-weight:800;
+      color:var(--pink-deep);margin-bottom:6px;text-wrap:balance;}
+    .finale-sub{font-size:.95rem;color:var(--text-muted);margin-bottom:20px;}
+    .recap-list{display:flex;flex-direction:column;gap:10px;margin-bottom:20px;}
+    .recap-item{display:flex;align-items:center;gap:12px;
+      background:rgba(255,255,255,.95);border:1px solid var(--card-border);
+      border-radius:var(--r-md);padding:11px 14px;text-align:left;box-shadow:var(--shadow-sm);}
+    .recap-ic{width:44px;height:44px;flex-shrink:0;}
+    .recap-txt h4{font-size:.9rem;font-weight:800;color:var(--text-main);}
+    .recap-txt p{font-size:.78rem;color:var(--text-muted);line-height:1.3;}
+    .finale-letter{background:#fff;border:2px solid var(--pink-soft);
+      border-radius:var(--r-lg);padding:18px 16px;margin-bottom:20px;
+      box-shadow:var(--shadow-md);text-align:center;}
+    .finale-letter p{font-size:.97rem;line-height:1.65;color:#4A333B;margin-bottom:10px;}
+    .signature{font-weight:800;color:var(--pink-deep);font-size:1rem;}
+    .finale-actions{display:flex;flex-direction:column;gap:10px;}
+
+    /* ── COUPONS ── */
+    #s-coupons{padding:18px 16px 32px;
+      padding-bottom:max(32px,env(safe-area-inset-bottom));overflow-y:auto;z-index:2;}
+    .cpn-header{text-align:center;margin-bottom:18px;}
+    .cpn-title{font-size:1.6rem;font-weight:800;color:var(--pink-deep);margin-bottom:4px;}
+    .cpn-sub{font-size:.88rem;color:var(--text-muted);}
+    #cpn-list{display:flex;flex-direction:column;gap:14px;margin-bottom:20px;}
+    .cpn-card{background:#fff;border:2px dashed #FFB6C1;border-radius:var(--r-lg);
+      padding:16px 14px;box-shadow:var(--shadow-sm);position:relative;
+      overflow:hidden;display:flex;flex-direction:column;gap:10px;transition:transform .2s;}
+    .cpn-card::before,.cpn-card::after{content:"";position:absolute;top:50%;
+      width:18px;height:18px;background:#FDF4F6;border-radius:50%;transform:translateY(-50%);}
+    .cpn-card::before{left:-9px} .cpn-card::after{right:-9px}
+    .cpn-top{display:flex;align-items:flex-start;gap:12px;}
+    .cpn-icon{font-size:1.9rem;line-height:1;background:var(--pink-blush);
+      padding:9px;border-radius:var(--r-md);flex-shrink:0;}
+    .cpn-info h3{font-size:1.02rem;font-weight:800;color:var(--text-main);margin-bottom:3px;}
+    .cpn-info p{font-size:.83rem;color:var(--text-muted);line-height:1.4;}
+    .cpn-badge{font-size:.68rem;font-weight:800;color:var(--pink-primary);
+      text-transform:uppercase;letter-spacing:.06em;}
+    .cpn-row{display:flex;align-items:center;justify-content:space-between;
+      margin-top:4px;padding-top:9px;border-top:1px dashed #FFE4E8;gap:8px;}
+    .btn-redeem{min-height:40px;padding:7px 16px;background:var(--pink-primary);
+      color:#fff;border:none;border-radius:var(--r-full);font-size:.83rem;font-weight:800;
+      cursor:pointer;display:flex;align-items:center;gap:5px;touch-action:manipulation;
+      transition:background .15s,transform .15s;white-space:nowrap;}
+    .btn-redeem:active{transform:scale(.94);background:var(--pink-deep)}
+    .btn-revisit{min-height:36px;padding:6px 14px;background:transparent;
+      color:var(--pink-deep);border:1.5px solid var(--pink-soft);border-radius:var(--r-full);
+      font-size:.8rem;font-weight:700;cursor:pointer;touch-action:manipulation;
+      transition:background .15s;white-space:nowrap;}
+    .btn-revisit:active{background:var(--pink-blush)}
+    .cpn-card.redeemed{border:2px solid #A7F3D0;background:#F9FFF8;}
+    .redeemed-stamp{font-size:.82rem;font-weight:800;color:#059669;background:#D1FAE5;
+      padding:5px 12px;border-radius:var(--r-full);display:inline-flex;align-items:center;
+      gap:4px;border:1px solid #A7F3D0;}
+    .cpn-footer{display:flex;flex-direction:column;gap:10px;}
+
+    /* ══════════════════════════════════════════
+       LICK SCREEN
+    ══════════════════════════════════════════ */
+    #s-lick{flex-direction:column;align-items:center;background:var(--bg);overflow:hidden;}
+    .lick-header{text-align:center;padding:10px 16px 6px;flex-shrink:0;}
+    .lick-header h2{font-size:1.15rem;font-weight:800;color:var(--pink-deep);}
+    .lick-header p{font-size:.82rem;color:var(--text-muted);margin-top:2px;}
+    #lick-canvas-wrap{flex:1;min-height:0;display:flex;align-items:center;
+      justify-content:center;width:100%;position:relative;}
+    #lickCanvas{touch-action:none;cursor:crosshair;display:block;
+      max-width:340px;width:100%;border-radius:var(--r-lg);
+      box-shadow:var(--shadow-lg);}
+    .lick-footer{flex-shrink:0;padding:10px 16px;
+      padding-bottom:max(10px,env(safe-area-inset-bottom));
+      width:100%;display:flex;flex-direction:column;gap:8px;align-items:center;}
+    #lick-hint{font-size:.88rem;font-weight:700;color:var(--pink-primary);
+      text-align:center;min-height:1.4em;transition:all .3s;}
+    #lick-progress-bar{width:100%;max-width:300px;height:8px;
+      background:#FFE4E8;border-radius:var(--r-full);overflow:hidden;margin-bottom:2px;}
+    #lick-progress-fill{height:100%;width:0%;
+      background:linear-gradient(90deg,#FF6B8B,#FF3D6B);
+      border-radius:var(--r-full);transition:width .2s ease;}
+    #lick-done-area{display:none;flex-direction:column;gap:8px;width:100%;align-items:center;}
+    #lick-done-msg{font-size:1rem;font-weight:800;color:var(--mint-primary);text-align:center;}
+
+    /* ══════════════════════════════════════════
+       VIDEO SCREENS (Movie + Hug)
+    ══════════════════════════════════════════ */
+    .video-screen{flex-direction:column;}
+    .video-screen-hdr{padding:12px 16px 8px;text-align:center;flex-shrink:0;}
+    .video-screen-hdr h2{font-size:1.2rem;font-weight:800;color:var(--pink-deep);}
+    .video-screen-hdr p{font-size:.82rem;color:var(--text-muted);margin-top:2px;}
+    .video-area{flex:0 0 auto;width:100%;aspect-ratio:16/9;position:relative;background:#111;
+      display:flex;align-items:center;justify-content:center;}
+    .video-area video{width:100%;height:100%;object-fit:contain;display:block;}
+    .vid-fallback{display:none;flex-direction:column;align-items:center;
+      justify-content:center;gap:12px;padding:24px;text-align:center;color:#fff;}
+    .vid-fallback .vid-fb-icon{font-size:3.5rem;}
+    .vid-fallback p{font-size:.9rem;opacity:.8;line-height:1.5;}
+    .vid-fallback code{font-size:.85rem;background:rgba(255,255,255,.15);
+      padding:4px 10px;border-radius:8px;}
+    .vid-overlay{position:absolute;inset:0;display:flex;align-items:center;
+      justify-content:center;transition:background .2s;}
+    .vid-overlay.dim{background:rgba(0,0,0,.3);}
+    .vid-play-btn{width:72px;height:72px;border-radius:50%;
+      background:rgba(255,255,255,.92);border:none;cursor:pointer;
+      display:flex;align-items:center;justify-content:center;
+      font-size:2rem;box-shadow:0 4px 20px rgba(0,0,0,.3);
+      transition:transform .15s,opacity .3s;touch-action:manipulation;}
+    .vid-play-btn:active{transform:scale(.92)}
+    .vid-play-btn.hidden{opacity:0;pointer-events:none;}
+    .vid-footer{padding:10px 16px;padding-bottom:max(10px,env(safe-area-inset-bottom));
+      display:flex;flex-direction:column;gap:8px;flex-shrink:0;
+      background:rgba(255,255,255,.9);border-top:1px solid var(--card-border);}
+    .vid-controls-row{display:flex;gap:8px;align-items:center;}
+    .vid-fullscreen-btn{min-height:36px;padding:6px 14px;background:var(--pink-blush);
+      color:var(--pink-deep);border:1.5px solid var(--pink-soft);border-radius:var(--r-full);
+      font-size:.82rem;font-weight:700;cursor:pointer;touch-action:manipulation;white-space:nowrap;}
+    .vid-fullscreen-btn:active{background:var(--pink-soft)}
+
+    /* ══════════════════════════════════════════
+       CHOICE DAY FORM
+    ══════════════════════════════════════════ */
+    #s-choice{overflow-y:auto;}
+    #s-choice,#s-choice *{user-select:text;-webkit-user-select:text;}
+    #s-choice .btn-primary,#s-choice .btn-secondary{user-select:none;-webkit-user-select:none;}
+    .choice-hdr{text-align:center;padding:16px 16px 10px;flex-shrink:0;}
+    .choice-hdr h2{font-size:1.3rem;font-weight:800;color:var(--pink-deep);}
+    .choice-hdr p{font-size:.85rem;color:var(--text-muted);margin-top:4px;}
+    .choice-form{padding:0 16px;display:flex;flex-direction:column;gap:14px;}
+    .choice-field label{display:block;font-size:.85rem;font-weight:700;
+      color:var(--pink-deep);margin-bottom:6px;}
+    .choice-field input,.choice-field textarea{
+      width:100%;padding:12px 14px;border:2px solid var(--pink-soft);
+      border-radius:var(--r-md);font-size:.95rem;font-family:inherit;
+      color:var(--text-main);background:#fff;resize:none;
+      transition:border-color .15s;outline:none;}
+    .choice-field textarea{min-height:78px;}
+    .choice-field input:focus,.choice-field textarea:focus{border-color:var(--pink-primary);}
+    .choice-actions{padding:16px;display:flex;flex-direction:column;gap:10px;
+      padding-bottom:max(16px,env(safe-area-inset-bottom));}
+    .choice-download{display:none;flex-direction:column;align-items:center;
+      gap:10px;padding:16px;background:rgba(255,255,255,.95);
+      border:2px solid #A7F3D0;border-radius:var(--r-lg);margin:0 16px 12px;}
+    .choice-download .dl-icon{font-size:2.5rem;}
+    .choice-download p{font-size:.9rem;color:#059669;font-weight:700;text-align:center;}
+    .choice-download a.btn-primary{text-decoration:none;}
+
+    /* ── FOCUS ── */
+    :focus-visible{outline:3px solid var(--pink-primary);outline-offset:3px;}
+    :focus:not(:focus-visible){outline:none;}
+  </style>
+</head>
+<body>
+<div id="app">
+
+  <!-- TOP BAR -->
+  <header id="top-bar">
+    <div class="brand">🚗 <span id="brand-name">Sweet Ride ❤️</span></div>
+    <div class="bar-actions">
+      <button id="btn-sound" class="icon-btn" aria-label="Toggle sound" title="Sound">
+        <span id="sound-icon">🔇</span>
+      </button>
+      <button id="btn-home" class="icon-btn" aria-label="Return to home" title="Home" style="display:none">🏠</button>
+    </div>
+  </header>
+
+  <!-- FLOATING HEARTS -->
+  <div id="hearts-bg" aria-hidden="true"></div>
+
+  <!-- ══ SCREEN: HERO ══ -->
+  <section id="s-hero" class="screen active" aria-label="Welcome">
+    <div class="hero-body">
+      <div class="badge" id="hero-badge">Made with Love for You 💕</div>
+      <h1 class="hero-title" id="hero-title">A Sweet Ride to My Heart ❤️</h1>
+      <p class="hero-sub" id="hero-sub">A tiny adventure made just for you.</p>
+      <div class="hero-car" aria-hidden="true">
+        <svg viewBox="0 0 200 130" fill="none" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
+          <defs>
+            <linearGradient id="hcg" x1="42" y1="55" x2="158" y2="107" gradientUnits="userSpaceOnUse">
+              <stop stop-color="#FF7597"/><stop offset="1" stop-color="#FF3864"/>
+            </linearGradient>
+            <linearGradient id="hbg" x1="161" y1="72" x2="200" y2="72" gradientUnits="userSpaceOnUse">
+              <stop stop-color="#FFF9D2"/><stop offset="1" stop-color="#FFF9D2" stop-opacity="0"/>
+            </linearGradient>
+          </defs>
+          <ellipse cx="100" cy="116" rx="76" ry="11" fill="rgba(255,75,114,0.18)"/>
+          <path d="M110 50 L118 16" stroke="#888" stroke-width="2.5" stroke-linecap="round"/>
+          <path d="M118 16 C118 12 123 10 126 13 C129 10 134 12 134 16 C134 21 126 26 126 26 C126 26 118 21 118 16Z" fill="#FF4B72"/>
+          <rect x="35" y="82" width="23" height="40" rx="8" fill="#2C2C2E"/>
+          <rect x="38" y="86" width="17" height="32" rx="6" fill="#48484A"/>
+          <circle cx="46" cy="102" r="5" fill="#E5E5EA"/>
+          <rect x="142" y="82" width="23" height="40" rx="8" fill="#2C2C2E"/>
+          <rect x="145" y="86" width="17" height="32" rx="6" fill="#48484A"/>
+          <circle cx="154" cy="102" r="5" fill="#E5E5EA"/>
+          <rect x="42" y="55" width="116" height="52" rx="20" fill="url(#hcg)"/>
+          <rect x="44" y="57" width="112" height="48" rx="18" stroke="rgba(255,255,255,.55)" stroke-width="2"/>
+          <rect x="96" y="55" width="8" height="52" fill="#fff" opacity=".75"/>
+          <path d="M65 55 L79 34 H121 L135 55Z" fill="#FF5C8A"/>
+          <path d="M73 53 L82 37 H118 L127 53Z" fill="#DDF4FF" opacity=".9"/>
+          <path d="M85 39 L93 39 L82 51 L77 51Z" fill="#fff" opacity=".55"/>
+          <circle cx="154" cy="72" r="7" fill="#FFF3A8"/>
+          <circle cx="154" cy="72" r="4" fill="#fff"/>
+          <path d="M161 68 L200 60 L200 84 L161 76Z" fill="url(#hbg)" opacity=".45"/>
+          <rect x="42" y="66" width="4" height="12" rx="2" fill="#FF3B30"/>
+        </svg>
+      </div>
+      <p class="hero-hint" id="hero-hint">Ready to collect a little love? 🍦</p>
+    </div>
+    <div class="hero-footer">
+      <button id="btn-start" class="btn-primary"><span>START ENGINE ❤️</span></button>
+    </div>
+  </section>
+
+  <!-- ══ SCREEN: GAME ══ -->
+  <section id="s-game" class="screen" aria-label="Game">
+    <div id="game-hud">
+      <div id="hud-title" role="status" aria-live="polite">Scoops: 0/3</div>
+      <div id="scoop-pills">
+        <div id="pill-mint"       class="spill mint"       aria-label="Mint Choc Chip">🍦 Mint</div>
+        <div id="pill-strawberry" class="spill strawberry" aria-label="Strawberry Sundae">🍓 Berry</div>
+        <div id="pill-vanilla"    class="spill vanilla"    aria-label="Vanilla Turbo">🍨 Vanilla</div>
+      </div>
+    </div>
+    <div id="game-toast" aria-hidden="true">Drive &amp; collect all 3 scoops! 🚗💨</div>
+    <div id="canvas-wrap">
+      <canvas id="gameCanvas" aria-label="Game — drive to collect ice cream scoops"></canvas>
+    </div>
+    <div id="controls" aria-label="Driving controls">
+      <div class="ctrl-cluster">
+        <button id="btn-left"    class="ctrl-btn" aria-label="Steer left">◀<span class="lbl">LEFT</span></button>
+        <button id="btn-right"   class="ctrl-btn" aria-label="Steer right">▶<span class="lbl">RIGHT</span></button>
+      </div>
+      <div class="ctrl-cluster">
+        <button id="btn-back"    class="ctrl-btn"       aria-label="Reverse">▼<span class="lbl">BACK</span></button>
+        <button id="btn-forward" class="ctrl-btn drive" aria-label="Drive forward">▲<span class="lbl">DRIVE</span></button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ SCREEN: FINALE ══ -->
+  <section id="s-finale" class="screen" aria-label="Finale">
+    <canvas id="finale-canvas" aria-hidden="true"></canvas>
+    <div class="finale-inner">
+      <h2 class="finale-title" id="finale-title">You Reached My Heart! 💖</h2>
+      <p class="finale-sub">All 3 scoops gathered with love!</p>
+      <div class="recap-list">
+        <div class="recap-item">
+          <div class="recap-ic" id="recap-mint-ic"></div>
+          <div class="recap-txt">
+            <h4 id="recap-mint-name">Mint Choc Chip</h4>
+            <p  id="recap-mint-msg"></p>
+          </div>
+        </div>
+        <div class="recap-item">
+          <div class="recap-ic" id="recap-berry-ic"></div>
+          <div class="recap-txt">
+            <h4 id="recap-berry-name">Strawberry Sundae</h4>
+            <p  id="recap-berry-msg"></p>
+          </div>
+        </div>
+        <div class="recap-item">
+          <div class="recap-ic" id="recap-van-ic"></div>
+          <div class="recap-txt">
+            <h4 id="recap-van-name">Vanilla Turbo</h4>
+            <p  id="recap-van-msg"></p>
+          </div>
+        </div>
+      </div>
+      <div class="finale-letter">
+        <p id="finale-body"></p>
+        <div class="signature" id="finale-sig"></div>
+      </div>
+      <div class="finale-actions">
+        <button id="btn-open-coupons" class="btn-primary">OPEN YOUR VIP COUPON BOOK 💌</button>
+        <button id="btn-finale-replay" class="btn-secondary">PLAY AGAIN 🚗💨</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ SCREEN: COUPONS ══ -->
+  <section id="s-coupons" class="screen" aria-label="VIP Coupon Book">
+    <div class="cpn-header">
+      <h2 class="cpn-title">VIP Love Coupons 💌</h2>
+      <p class="cpn-sub">Redeemable with me anytime. No expiration date!</p>
+    </div>
+    <div id="cpn-list" aria-label="Coupon list"></div>
+    <div class="cpn-footer">
+      <button id="btn-back-finale"  class="btn-secondary">← BACK TO FINALE RECAP</button>
+      <button id="btn-coupons-play" class="btn-primary">DRIVE AGAIN 🚗💨</button>
+    </div>
+  </section>
+
+  <!-- ══ SCREEN: LICK ══ -->
+  <section id="s-lick" class="screen" aria-label="Ice cream lick game">
+    <div class="lick-header">
+      <h2>Lick Your Ice Cream! 🍦</h2>
+      <p>Swipe your finger over each scoop to eat it!</p>
+    </div>
+    <div id="lick-canvas-wrap">
+      <canvas id="lickCanvas" aria-label="Triple scoop ice cream — swipe to lick"></canvas>
+    </div>
+    <div class="lick-footer">
+      <div id="lick-progress-bar"><div id="lick-progress-fill"></div></div>
+      <p id="lick-hint">Swipe your finger to lick! 👅🍦</p>
+      <div id="lick-done-area">
+        <p id="lick-done-msg">🍦 Date night activated! Let's go! ❤️</p>
+        <button id="btn-lick-back" class="btn-primary" style="max-width:300px">BACK TO COUPONS 💌</button>
+      </div>
+      <button id="btn-lick-back2" class="btn-secondary" style="max-width:300px">← BACK</button>
+    </div>
+  </section>
+
+  <!-- ══ SCREEN: MOVIE ══ -->
+  <section id="s-movie" class="screen video-screen" aria-label="Movie Night">
+    <div class="video-screen-hdr">
+      <h2>🎬 Cozy Movie Night</h2>
+      <p>Snuggle up and enjoy! Unlimited cuddles included.</p>
+    </div>
+    <div class="video-area" id="movie-area">
+      <video id="movie-vid" src="assets/movie.mp4" playsinline preload="none"
+        aria-label="Movie night video"></video>
+      <div class="vid-fallback" id="movie-fallback">
+        <div class="vid-fb-icon">🎬</div>
+        <p>Your movie will appear here!</p>
+        <p>Add your video file to:</p>
+        <code>assets/movie.mp4</code>
+      </div>
+      <div class="vid-overlay" id="movie-overlay">
+        <button class="vid-play-btn" id="movie-play-btn" aria-label="Play movie">▶</button>
+      </div>
+    </div>
+    <div class="vid-footer">
+      <div class="vid-controls-row">
+        <button id="movie-fs-btn" class="vid-fullscreen-btn" style="flex-shrink:0">⛶ Fullscreen</button>
+        <button id="btn-movie-back" class="btn-secondary" style="flex:1;min-height:40px">← Back to Coupons</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ SCREEN: HUG ══ -->
+  <section id="s-hug" class="screen video-screen" aria-label="Hug Session">
+    <div class="video-screen-hdr">
+      <h2>🫂 Extra Long Hug</h2>
+      <p>A warm hug that won't let go until you say so. 🧸</p>
+    </div>
+    <div class="video-area" id="hug-area">
+      <video id="hug-vid" src="assets/hug.mp4" playsinline preload="none"
+        aria-label="Hug video"></video>
+      <div class="vid-fallback" id="hug-fallback">
+        <div class="vid-fb-icon">🫂</div>
+        <p>Your hug video will appear here!</p>
+        <p>Add your video file to:</p>
+        <code>assets/hug.mp4</code>
+      </div>
+      <div class="vid-overlay" id="hug-overlay">
+        <button class="vid-play-btn" id="hug-play-btn" aria-label="Play hug video">▶</button>
+      </div>
+    </div>
+    <div class="vid-footer">
+      <div class="vid-controls-row">
+        <button id="hug-fs-btn" class="vid-fullscreen-btn" style="flex-shrink:0">⛶ Fullscreen</button>
+        <button id="btn-hug-back" class="btn-secondary" style="flex:1;min-height:40px">← Back to Coupons</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ SCREEN: CHOICE ══ -->
+  <section id="s-choice" class="screen" aria-label="Your Choice Day">
+    <div class="choice-hdr">
+      <h2>🌷 My Perfect Day</h2>
+      <p>Tell me exactly what you want! I'll make it happen. ✨</p>
+    </div>
+    <div class="choice-form">
+      <div class="choice-field">
+        <label for="f-todo">🎯 What do you want to do?</label>
+        <textarea id="f-todo" placeholder="Go for a walk, visit a café, watch a show..."></textarea>
+      </div>
+      <div class="choice-field">
+        <label for="f-where">📍 Where do you want to go?</label>
+        <input id="f-where" type="text" placeholder="Beach, park, shopping mall...">
+      </div>
+      <div class="choice-field">
+        <label for="f-eat">🍽️ What do you want to eat?</label>
+        <input id="f-eat" type="text" placeholder="Pizza, sushi, ice cream...">
+      </div>
+      <div class="choice-field">
+        <label for="f-wishes">💕 Any special wishes?</label>
+        <textarea id="f-wishes" placeholder="Anything at all — your wish is my command!"></textarea>
+      </div>
+    </div>
+    <div class="choice-download" id="choice-download">
+      <div class="dl-icon">🎀</div>
+      <p>Your wishlist card is ready to share!</p>
+      <a id="choice-dl-link" class="btn-primary" download="my-perfect-day.png"
+        style="text-decoration:none;max-width:300px">SAVE &amp; SEND TO HIM 💌</a>
+    </div>
+    <div class="choice-actions">
+      <button id="btn-choice-submit" class="btn-primary">SUBMIT MY WISHLIST ✨</button>
+      <button id="btn-choice-back"   class="btn-secondary">← BACK TO COUPONS</button>
+    </div>
+  </section>
+
+  <!-- ══ MODAL: LOVE NOTE ══ -->
+  <div id="modal-note" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="note-ttl">
+    <div class="modal-card">
+      <div class="modal-icon" id="note-icon" aria-hidden="true"></div>
+      <div class="modal-tag" id="note-tag">Flavor Unlocked</div>
+      <h3 class="modal-title" id="note-ttl">Mint Choc Chip</h3>
+      <div class="modal-msg" id="note-msg">You make even my ordinary days feel magical.</div>
+      <button id="btn-note-dismiss" class="btn-primary">CONTINUE DRIVING ❤️</button>
+    </div>
+  </div>
+
+</div><!-- #app -->
+
+<audio id="audio-rev" src="assets/Sweet Mischievous Motif.mp3" loop preload="none" aria-hidden="true"></audio>
+
+<script>
+/* ==========================================================================
+ * PERSONALIZATION CONFIG
+ * Edit this object to customize all text. No hardcoded user-facing strings.
+ * ======================================================================== */
+const CONFIG = {
+  girlfriendName: "My Dearest",
+  nickname:       "Cutie Pie",
+  senderName:     "Yours Always",
+  heroBadge:      "Made with Love for You 💕",
+  heroTitle:      "A Sweet Ride to My Heart ❤️",
+  subtitle:       "A tiny adventure made just for you.",
+  heroHint:       "Ready to collect a little love? 🍦",
+  startBtn:       "START ENGINE ❤️",
+
+  loveNotes: [
+    { id:"mint",        title:"Mint Choc Chip",    color:"#A8E6CF", tag:"Sweet & Refreshing",
+      message:"You make even my most ordinary days feel magical. Every little moment with you is sweet, refreshing, and deeply cherished.",
+      x:320, y:100, radius:22 },
+    { id:"strawberry",  title:"Strawberry Sundae", color:"#FF8DA1", tag:"Pure Joy & Sweetness",
+      message:"Your smile is still one of my absolute favorite things in the whole universe. It never fails to light up my entire world.",
+      x:90,  y:235, radius:22 },
+    { id:"vanilla",     title:"Vanilla Turbo",     color:"#FFF2B2", tag:"Timeless & Forever",
+      message:"No matter where life takes us or how fast the world moves, I would choose you all over again, every single day.",
+      x:330, y:365, radius:22 }
+  ],
+
+  finale: {
+    title: "You Reached My Heart! 💖",
+    body:  "You steered straight into my heart, collecting every sweet memory along the way. You mean absolutely everything to me — today and forever."
+  },
+
+  /* type: "lick" | "video" | "form"  */
+  coupons: [
+    { id:"icecream", type:"lick",  icon:"🍦", title:"Unlimited Ice Cream Date",
+      description:"Good for any ice cream parlor of your choice — as many scoops, waffle cones, and toppings as your heart desires!",
+      badge:"Sweetest Treat" },
+    { id:"movie",    type:"video", icon:"🎬", title:"Cozy Movie Night",
+      description:"You pick the movie, snacks, and blanket-fort arrangement. Unlimited cuddles and zero complaints guaranteed.",
+      badge:"Comfort VIP",   videoSrc:"assets/movie.mp4" },
+    { id:"hug",      type:"video", icon:"🫂", title:"Extra Long Hug Session",
+      description:"Valid for a warm, comforting, squeezy hug that doesn't let go until you say so. No time limit.",
+      badge:"Instant Warmth", videoSrc:"assets/hug.mp4" },
+    { id:"choice",   type:"form",  icon:"🌷", title:"Your Choice Day",
+      description:"A whole day where you call all the shots — what we eat, where we go, what we do is 100% your call.",
+      badge:"Queen For The Day" }
+  ]
+};
+
+/* ==========================================================================
+ * GAME STATE
+ * ======================================================================== */
+const State = {
+  screen: "HERO",
+  isPlaying: false,
+  isPaused:  false,
+  collectedScoops:  new Set(),
+  pendingNote:      null,
+  redeemedCoupons:  new Set(), // persists across replays
+
+  car: {
+    x:210, y:448, angle:-Math.PI/2, speed:0,
+    maxSpeed:185, revMaxSpeed:-95, accel:350, revAccel:270,
+    friction:0.915, turnSpeed:3.5, width:24, height:44, wheelTurn:0
+  },
+  input: { up:false, down:false, left:false, right:false },
+  particles: [],
+
+  reset() {
+    this.collectedScoops.clear();
+    this.pendingNote = null;
+    const c = this.car;
+    c.x=210; c.y=448; c.angle=-Math.PI/2; c.speed=0; c.wheelTurn=0;
+    this.input.up=this.input.down=this.input.left=this.input.right=false;
+    this.particles=[];
+    this.isPaused=false;
+  }
+};
+
+/* ==========================================================================
+ * LICK SCREEN STATE
+ * ======================================================================== */
+const LICK_W = 340;
+const LICK_H = 420;
+const LICK_BRUSH = 26;
+const LICK_THRESHOLD = 420; // distance pixels to eat a scoop
+
+// Scoop positions (bottom to top on cone: vanilla, strawberry, mint)
+const LICK_SCOOPS = [
+  { id:"vanilla",    color:"#FFF2B2", cx:LICK_W/2, cy:242, r:56 },
+  { id:"strawberry", color:"#FF8DA1", cx:LICK_W/2, cy:176, r:52 },
+  { id:"mint",       color:"#A8E6CF", cx:LICK_W/2, cy:116, r:48 }
+];
+
+let lickCtx   = null;   // main lick canvas context
+let lickScoopCanvases = []; // offscreen canvas per scoop
+let lickRaf   = 0;
+
+const LickState = {
+  lickProgress: [0, 0, 0],  // accumulated lick distance per scoop
+  scoopAlpha:   [1, 1, 1],  // current alpha per scoop
+  scoopGone:    [false, false, false],
+  totalGone:    0,
+  lastPos:      null,
+  isActive:     false,
+  allDone:      false,
+  particles:    []
+};
+
+/* ==========================================================================
+ * GAME CANVAS CONSTANTS
+ * ======================================================================== */
+const LW = 420, LH = 500;
+
+/* ==========================================================================
+ * SOUND ENGINE
+ * ======================================================================== */
+const Sound = (() => {
+  let ctx = null, revAudio = null, enabled = true, engTimer = 0;
+
+  function ac() {
+    if (!ctx) { try { ctx = new (window.AudioContext||window.webkitAudioContext)(); } catch(e){} }
+    if (ctx && ctx.state==="suspended") { try{ctx.resume();}catch(e){} }
+    return ctx;
+  }
+
+  function tone(freq, type="sine", dur=0.15, vol=0.07) {
+    if (!enabled) return;
+    const a = ac(); if (!a) return;
+    try {
+      const o=a.createOscillator(), g=a.createGain();
+      o.type=type; o.frequency.setValueAtTime(freq,a.currentTime);
+      g.gain.setValueAtTime(vol,a.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.0001,a.currentTime+dur);
+      o.connect(g); g.connect(a.destination);
+      o.start(); o.stop(a.currentTime+dur);
+    } catch(e){}
+  }
+
+  return {
+    init() { ac(); const el=document.getElementById("audio-rev"); if(el&&el.src&&!el.src.endsWith("null"))revAudio=el; },
+    tap()    { tone(460,"sine",.07,.06); },
+    chime()  { [523.25,659.25,783.99,1046.5].forEach((f,i)=>setTimeout(()=>tone(f,"sine",.38,.09),i*75)); },
+    fanfare(){ [{f:523.25,d:.17},{f:659.25,d:.17},{f:783.99,d:.17},{f:1046.5,d:.48}]
+                 .forEach((n,i)=>setTimeout(()=>tone(n.f,"triangle",n.d,.11),i*165)); },
+       engineTick(dt) {
+      if (!enabled || !State.input.up) { engTimer = 0; return; }
+      engTimer += dt;
+      if (engTimer > .14) { tone(128+Math.abs(State.car.speed)*.35,"triangle",.1,.035); engTimer=0; }
+    },
+    stopRev() { engTimer=0; if(revAudio&&!revAudio.paused){revAudio.pause();revAudio.currentTime=0;} },
+    toggleMusic() {
+      if (!revAudio) return;
+      if (revAudio.paused) { revAudio.volume=0.4; revAudio.play().catch(()=>{}); }
+      else { revAudio.pause(); }
+      document.getElementById("sound-icon").textContent = revAudio.paused ? "🔇" : "🔊";
+    },
+    stopRev() { engTimer=0; if(revAudio&&!revAudio.paused){revAudio.pause();revAudio.currentTime=0;} },
+    toggle() { enabled=!enabled; if(!enabled)this.stopRev(); document.getElementById("sound-icon").textContent=enabled?"🔊":"🔇"; }
+  };
+})();
+
+/* ==========================================================================
+ * DOM CACHE
+ * ======================================================================== */
+const DOM = {
+  screens: {
+    HERO:"s-hero", GAME:"s-game", FINALE:"s-finale",
+    COUPONS:"s-coupons", LICK:"s-lick", MOVIE:"s-movie",
+    HUG:"s-hug", CHOICE:"s-choice"
+  },
+  canvas:        document.getElementById("gameCanvas"),
+  finaleCanvas:  document.getElementById("finale-canvas"),
+  lickCanvas:    document.getElementById("lickCanvas"),
+  hudTitle:      document.getElementById("hud-title"),
+  pillMint:      document.getElementById("pill-mint"),
+  pillBerry:     document.getElementById("pill-strawberry"),
+  pillVan:       document.getElementById("pill-vanilla"),
+  modalNote:     document.getElementById("modal-note"),
+  noteIcon:      document.getElementById("note-icon"),
+  noteTag:       document.getElementById("note-tag"),
+  noteTtl:       document.getElementById("note-ttl"),
+  noteMsg:       document.getElementById("note-msg"),
+  cpnList:       document.getElementById("cpn-list"),
+  homeBtn:       document.getElementById("btn-home"),
+};
+
+let gctx = null; // game 2D context
+let prevScreen = "HERO";
+
+/* ==========================================================================
+ * SCREEN NAVIGATION
+ * ======================================================================== */
+function switchScreen(target) {
+  // Pause/stop things on leaving
+  if (prevScreen === "MOVIE") { const v=document.getElementById("movie-vid"); v.pause(); }
+  if (prevScreen === "HUG")   { const v=document.getElementById("hug-vid");   v.pause(); }
+  if (prevScreen === "LICK")  { cancelAnimationFrame(lickRaf); lickRaf=0; LickState.isActive=false; }
+
+   prevScreen = target;
+  State.screen = target;
+  State.isPlaying = (target === "GAME");
+
+  Object.entries(DOM.screens).forEach(([k, id]) => {
+    document.getElementById(id).classList.toggle("active", k === target);
+  });
+
+  DOM.homeBtn.style.display = (target !== "HERO") ? "inline-flex" : "none";
+
+  if (target === "GAME")    { resizeCanvas(); clearInputs(); showGameToast(); }
+  if (target === "FINALE")  { renderFinale(); startFinaleConfetti(); }
+  if (target === "COUPONS") { renderCoupons(); }
+  if (target === "LICK")    { initLickScreen(); startLickLoop(); }
+  if (target === "MOVIE")   { initVideoScreen("movie"); }
+  if (target === "HUG")     { initVideoScreen("hug"); }
+
+  updateHud();
+}
+
+/* ==========================================================================
+ * GAME CANVAS
+ * ======================================================================== */
+function resizeCanvas() {
+  if (!gctx) gctx = DOM.canvas.getContext("2d");
+  const dpr = window.devicePixelRatio || 1;
+  DOM.canvas.width  = LW * dpr;
+  DOM.canvas.height = LH * dpr;
+  if (gctx.resetTransform) gctx.resetTransform();
+  gctx.scale(dpr, dpr);
+}
+window.addEventListener("resize", () => { if (State.screen==="GAME") resizeCanvas(); });
+
+/* Game Toast */
+function showGameToast() {
+  const old = document.getElementById("game-toast");
+  const t = old.cloneNode(true);
+  old.parentNode.replaceChild(t, old);
+  setTimeout(()=>{ t.style.display="none"; }, 3200);
+}
+
+/* HUD */
+function updateHud() {
+  const n = State.collectedScoops.size;
+  DOM.hudTitle.textContent = `Scoops: ${n}/3`;
+  DOM.pillMint.classList.toggle("got",  State.collectedScoops.has("mint"));
+  DOM.pillBerry.classList.toggle("got", State.collectedScoops.has("strawberry"));
+  DOM.pillVan.classList.toggle("got",   State.collectedScoops.has("vanilla"));
+}
+
+/* ==========================================================================
+ * INPUT CONTROLLER
+ * ======================================================================== */
+function clearInputs() {
+  State.input.up=State.input.down=State.input.left=State.input.right=false;
+  ["btn-forward","btn-back","btn-left","btn-right"].forEach(id => {
+    const el=document.getElementById(id); if(el) el.classList.remove("pressed");
+  });
+}
+
+function bindCtrl(id, key) {
+  const el = document.getElementById(id); if (!el) return;
+  const on  = e=>{ e.preventDefault(); Sound.init(); State.input[key]=true;  el.classList.add("pressed");    try{el.setPointerCapture(e.pointerId);}catch(_){} };
+  const off = e=>{ e.preventDefault(); State.input[key]=false; el.classList.remove("pressed"); try{el.releasePointerCapture(e.pointerId);}catch(_){} };
+  el.addEventListener("pointerdown",        on,  {passive:false});
+  el.addEventListener("pointerup",          off, {passive:false});
+  el.addEventListener("pointercancel",      off, {passive:false});
+  el.addEventListener("lostpointercapture", off, {passive:false});
+}
+bindCtrl("btn-forward","up"); bindCtrl("btn-back","down");
+bindCtrl("btn-left","left");  bindCtrl("btn-right","right");
+
+window.addEventListener("keydown", e => {
+  if (State.isPaused||State.screen!=="GAME") return;
+  if (["ArrowUp","w","W"].includes(e.key))    State.input.up=true;
+  if (["ArrowDown","s","S"].includes(e.key))  State.input.down=true;
+  if (["ArrowLeft","a","A"].includes(e.key))  State.input.left=true;
+  if (["ArrowRight","d","D"].includes(e.key)) State.input.right=true;
+});
+window.addEventListener("keyup", e => {
+  if (["ArrowUp","w","W"].includes(e.key))    State.input.up=false;
+  if (["ArrowDown","s","S"].includes(e.key))  State.input.down=false;
+  if (["ArrowLeft","a","A"].includes(e.key))  State.input.left=false;
+  if (["ArrowRight","d","D"].includes(e.key)) State.input.right=false;
+});
+window.addEventListener("blur", clearInputs);
+document.addEventListener("visibilitychange", ()=>{ if(document.hidden) clearInputs(); });
+
+/* ==========================================================================
+ * PHYSICS
+ * ======================================================================== */
+function updatePhysics(dt) {
+  if (!State.isPlaying||State.isPaused) return;
+  const car = State.car;
+  const moving = Math.abs(car.speed) > 4;
+  if (moving) {
+    if (State.input.left)       { car.angle -= car.turnSpeed*dt; car.wheelTurn=-0.34; }
+    else if (State.input.right) { car.angle += car.turnSpeed*dt; car.wheelTurn= 0.34; }
+    else                        { car.wheelTurn=0; }
+  } else { car.wheelTurn=0; }
+
+  if (State.input.up) {
+    car.speed += car.accel*dt;
+    if (car.speed > car.maxSpeed) car.speed = car.maxSpeed;
+    Sound.engineTick(dt);
+    if (Math.random()<.4) {
+      const rx=car.x-Math.cos(car.angle)*20, ry=car.y-Math.sin(car.angle)*20;
+      State.particles.push({
+        x:rx+(Math.random()-.5)*7, y:ry+(Math.random()-.5)*7,
+        vx:-Math.cos(car.angle)*22+(Math.random()-.5)*14,
+        vy:-Math.sin(car.angle)*22+(Math.random()-.5)*14,
+        color:Math.random()<.5?"rgba(255,182,193,0.65)":"rgba(255,255,255,0.75)",
+        size:2.5+Math.random()*2.5, life:.4, maxLife:.4, isHeart:false
+      });
+    }
+  } else if (State.input.down) {
+    car.speed -= car.revAccel*dt;
+    if (car.speed < car.revMaxSpeed) car.speed = car.revMaxSpeed;
+  } else {
+    car.speed *= Math.pow(car.friction, dt*60);
+    if (Math.abs(car.speed)<1.5) car.speed=0;
+  }
+
+  car.x += Math.cos(car.angle)*car.speed*dt;
+  car.y += Math.sin(car.angle)*car.speed*dt;
+
+  const M=28;
+  if (car.x<M)    { car.x=M;    car.speed*=-.25; }
+  if (car.x>LW-M) { car.x=LW-M; car.speed*=-.25; }
+  if (car.y<M)    { car.y=M;    car.speed*=-.25; }
+  if (car.y>LH-M) { car.y=LH-M; car.speed*=-.25; }
+
+  checkCollisions();
+
+  for (let i=State.particles.length-1;i>=0;i--) {
+    const p=State.particles[i];
+    p.life-=dt; p.x+=p.vx*dt; p.y+=p.vy*dt;
+    if (p.life<=0) State.particles.splice(i,1);
+  }
+}
+
+/* ==========================================================================
+ * COLLISION + COLLECTION
+ * ======================================================================== */
+function checkCollisions() {
+  const car=State.car;
+  CONFIG.loveNotes.forEach(sc=>{
+    if (State.collectedScoops.has(sc.id)) return;
+    if (Math.hypot(car.x-sc.x, car.y-sc.y)<38) collectScoop(sc);
+  });
+}
+
+function collectScoop(sc) {
+  State.collectedScoops.add(sc.id);
+  Sound.chime();
+  spawnBurst(sc.x, sc.y, sc.color);
+  updateHud();
+  State.isPaused = true;
+  clearInputs();
+  setTimeout(()=>showNoteModal(sc), 220);
+}
+
+function spawnBurst(x, y, color) {
+  for (let i=0;i<30;i++) {
+    const ang=Math.random()*Math.PI*2, spd=45+Math.random()*130;
+    State.particles.push({
+      x,y, vx:Math.cos(ang)*spd, vy:Math.sin(ang)*spd,
+      color:i%2===0?color:"#FF5376", size:4+Math.random()*5,
+      life:.85+Math.random()*.45, maxLife:1.3, isHeart:(i%3===0)
+    });
+  }
+}
+
+/* ==========================================================================
+ * GAME RENDERING
+ * ======================================================================== */
+function renderGame() {
+  if (!gctx) return;
+  gctx.clearRect(0,0,LW,LH);
+  drawTrack(gctx);
+  drawCollectibles(gctx);
+  drawParticles(gctx, State.particles);
+  drawCar(gctx, State.car);
+}
+
+function drawTrack(ctx) {
+  ctx.fillStyle="#E8F8EE"; ctx.fillRect(0,0,LW,LH);
+  ctx.fillStyle="#FAFAF8"; ctx.strokeStyle="#FFCCD5"; ctx.lineWidth=4;
+  ctx.beginPath(); ctx.roundRect(20,20,LW-40,LH-40,42); ctx.fill(); ctx.stroke();
+  ctx.fillStyle="#FFF0F4"; ctx.strokeStyle="#FFD9E2"; ctx.lineWidth=3;
+  ctx.beginPath(); ctx.roundRect(96,108,LW-192,LH-216,34); ctx.fill(); ctx.stroke();
+  ctx.fillStyle="#FFE1E9"; ctx.beginPath(); ctx.arc(LW/2,LH/2,30,0,Math.PI*2); ctx.fill();
+  ctx.strokeStyle="#FFB6C1"; ctx.lineWidth=2; ctx.stroke();
+  ctx.font="22px sans-serif"; ctx.textAlign="center"; ctx.textBaseline="middle";
+  ctx.fillText("💖",LW/2,LH/2);
+  ctx.setLineDash([12,14]); ctx.strokeStyle="#FFE2E8"; ctx.lineWidth=3;
+  ctx.beginPath(); ctx.roundRect(57,60,LW-114,LH-120,38); ctx.stroke(); ctx.setLineDash([]);
+  ctx.save(); ctx.translate(210,458);
+  const sw=70,sh=11,bs=7;
+  for (let bx=-sw/2;bx<sw/2;bx+=bs){
+    ctx.fillStyle=Math.floor((bx+sw/2)/bs)%2===0?"#FF5376":"#fff";
+    ctx.fillRect(bx,-sh/2,bs,sh);
+  }
+  ctx.restore();
+  drawFlower(ctx,38,38,"#FF8DA1"); drawFlower(ctx,LW-38,38,"#A8E6CF");
+  drawFlower(ctx,38,LH-38,"#FFF2B2"); drawFlower(ctx,LW-38,LH-38,"#D8B4FE");
+}
+
+function drawFlower(ctx,x,y,color) {
+  ctx.save(); ctx.fillStyle=color;
+  for(let i=0;i<5;i++){const a=(i*Math.PI*2)/5;ctx.beginPath();ctx.arc(x+Math.cos(a)*6,y+Math.sin(a)*6,4,0,Math.PI*2);ctx.fill();}
+  ctx.fillStyle="#FFF9E6"; ctx.beginPath(); ctx.arc(x,y,3.2,0,Math.PI*2); ctx.fill(); ctx.restore();
+}
+
+function drawCollectibles(ctx) {
+  const t=performance.now()*.003;
+  CONFIG.loveNotes.forEach(sc=>{
+    if (State.collectedScoops.has(sc.id)) return;
+    ctx.save();
+    const by=sc.y+Math.sin(t+sc.x*.01)*4.5, R=sc.radius;
+    ctx.beginPath(); ctx.arc(sc.x,by,R+7+Math.sin(t*2.2)*2,0,Math.PI*2);
+    ctx.fillStyle=sc.color+"44"; ctx.fill();
+    ctx.beginPath(); ctx.arc(sc.x,by-4,R-2,0,Math.PI*2);
+    ctx.fillStyle=sc.color; ctx.fill();
+    ctx.strokeStyle="rgba(255,255,255,.82)"; ctx.lineWidth=2; ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(sc.x-13,by+1); ctx.lineTo(sc.x+13,by+1); ctx.lineTo(sc.x,by+20); ctx.closePath();
+    ctx.fillStyle="#F4C47A"; ctx.fill(); ctx.strokeStyle="#D99E4B"; ctx.lineWidth=1; ctx.stroke();
+    if (sc.id==="mint") {
+      ctx.fillStyle="#3D2B1F";
+      [[sc.x-5,by-8],[sc.x+4,by-5],[sc.x-2,by]].forEach(([cx,cy])=>{ctx.beginPath();ctx.ellipse(cx,cy,2.2,1.5,.4,0,Math.PI*2);ctx.fill();});
+    } else if (sc.id==="strawberry") {
+      ctx.fillStyle="#FF1E44"; ctx.beginPath(); ctx.arc(sc.x,by-18,3.8,0,Math.PI*2); ctx.fill();
+      ctx.strokeStyle="#D90029"; ctx.lineWidth=1; ctx.stroke();
+      ctx.strokeStyle="#4A7C59"; ctx.lineWidth=1.5; ctx.beginPath(); ctx.moveTo(sc.x,by-22); ctx.lineTo(sc.x+3,by-26); ctx.stroke();
+    } else if (sc.id==="vanilla") {
+      ctx.fillStyle="#D97706"; ctx.font="13px sans-serif"; ctx.textAlign="center"; ctx.textBaseline="middle";
+      ctx.fillText("⚡",sc.x,by-5);
+    }
+    ctx.restore();
+  });
+}
+
+function drawCar(ctx, car) {
+  ctx.save(); ctx.translate(car.x,car.y); ctx.rotate(car.angle+Math.PI/2);
+  ctx.fillStyle="rgba(0,0,0,0.16)"; ctx.beginPath(); ctx.roundRect(-13,-20,26,44,8); ctx.fill();
+  const wheel=(wx,wy,ta=0)=>{ctx.save();ctx.translate(wx,wy);ctx.rotate(ta);ctx.fillStyle="#252525";ctx.beginPath();ctx.roundRect(-4,-7,8,14,3);ctx.fill();ctx.fillStyle="#C8C8C8";ctx.fillRect(-1.5,-3,3,6);ctx.restore();};
+  wheel(-13,-14,car.wheelTurn); wheel(13,-14,car.wheelTurn); wheel(-13,15,0); wheel(13,15,0);
+  ctx.fillStyle="#FF5376"; ctx.beginPath(); ctx.roundRect(-11,-22,22,44,8); ctx.fill();
+  ctx.strokeStyle="#fff"; ctx.lineWidth=1.5; ctx.stroke();
+  ctx.fillStyle="rgba(255,255,255,0.8)"; ctx.fillRect(-3,-22,6,44);
+  ctx.fillStyle="#E02E56"; ctx.beginPath(); ctx.roundRect(-9,-11,18,24,5); ctx.fill();
+  ctx.fillStyle="#BEE3F8"; ctx.beginPath(); ctx.roundRect(-7,-9,14,8,3); ctx.fill();
+  ctx.fillStyle="rgba(255,255,255,.55)"; ctx.beginPath(); ctx.roundRect(-6,-8,4,6,2); ctx.fill();
+  ctx.fillStyle="#BEE3F8"; ctx.beginPath(); ctx.roundRect(-7,5,14,5,2); ctx.fill();
+  ctx.fillStyle="#FEF08A";
+  ctx.beginPath(); ctx.arc(-7,-22,2.8,0,Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.arc(7,-22,2.8,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle="rgba(255,243,168,.35)";
+  ctx.beginPath(); ctx.arc(-7,-22,5,0,Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.arc(7,-22,5,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle=State.input.down?"#FF0000":"#991B1B";
+  ctx.fillRect(-10,20,5,2); ctx.fillRect(5,20,5,2);
+  ctx.strokeStyle="#888"; ctx.lineWidth=1.5; ctx.beginPath(); ctx.moveTo(2,8); ctx.lineTo(4,24); ctx.stroke();
+  ctx.fillStyle="#FF1E44"; ctx.beginPath(); ctx.arc(4,25,2.5,0,Math.PI*2); ctx.fill();
+  ctx.restore();
+}
+
+function drawParticles(ctx, parts) {
+  for (const p of parts) {
+    ctx.save(); ctx.globalAlpha=Math.max(0,p.life/p.maxLife); ctx.fillStyle=p.color;
+    if (p.isHeart) { ctx.font=`${Math.floor(p.size*2)}px sans-serif`; ctx.textAlign="center"; ctx.textBaseline="middle"; ctx.fillText("❤️",p.x,p.y); }
+    else { ctx.beginPath(); ctx.arc(p.x,p.y,p.size,0,Math.PI*2); ctx.fill(); }
+    ctx.restore();
+  }
+}
+
+/* ==========================================================================
+ * MAIN GAME LOOP
+ * ======================================================================== */
+let lastTime = 0;
+function gameLoop(now) {
+  requestAnimationFrame(gameLoop);
+  if (document.hidden) return;
+  const dt = Math.min((now-lastTime)/1000, 0.1);
+  lastTime = now;
+  if (State.screen==="GAME") { updatePhysics(dt); renderGame(); }
+}
+
+/* ==========================================================================
+ * LOVE NOTE MODAL
+ * ======================================================================== */
+function scoopSVG(id) {
+  const s={
+    mint:`<svg viewBox="0 0 70 70" width="100%" height="100%"><circle cx="35" cy="27" r="22" fill="#A8E6CF"/><circle cx="27" cy="22" r="3" fill="#4B382A"/><circle cx="41" cy="24" r="2.5" fill="#4B382A"/><circle cx="34" cy="33" r="3" fill="#4B382A"/><polygon points="21,36 49,36 35,64" fill="#F4C47A" stroke="#D99E4B" stroke-width="1.5"/></svg>`,
+    strawberry:`<svg viewBox="0 0 70 70" width="100%" height="100%"><circle cx="35" cy="27" r="22" fill="#FF8DA1"/><circle cx="35" cy="13" r="5" fill="#E60026"/><path d="M25 23 Q35 31 45 23" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round"/><polygon points="21,36 49,36 35,64" fill="#F4C47A" stroke="#D99E4B" stroke-width="1.5"/></svg>`,
+    vanilla:`<svg viewBox="0 0 70 70" width="100%" height="100%"><circle cx="35" cy="27" r="22" fill="#FFF2B2"/><path d="M30 17 L38 26 L33 27 L37 35" stroke="#D97706" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/><polygon points="21,36 49,36 35,64" fill="#F4C47A" stroke="#D99E4B" stroke-width="1.5"/></svg>`
+  };
+  return s[id]||s.vanilla;
+}
+
+function showNoteModal(sc) {
+  DOM.noteIcon.innerHTML=scoopSVG(sc.id);
+  DOM.noteTag.textContent=sc.tag||"Love Note Unlocked";
+  DOM.noteTtl.textContent=sc.title;
+  DOM.noteMsg.textContent=sc.message;
+  DOM.modalNote.classList.add("open");
+  setTimeout(()=>document.getElementById("btn-note-dismiss").focus(),50);
+}
+
+document.getElementById("btn-note-dismiss").addEventListener("click",()=>{
+  Sound.tap(); DOM.modalNote.classList.remove("open");
+  if (State.collectedScoops.size>=3) { Sound.fanfare(); setTimeout(()=>switchScreen("FINALE"),320); }
+  else State.isPaused=false;
+});
+
+/* ==========================================================================
+ * FINALE
+ * ======================================================================== */
+function renderFinale() {
+  document.getElementById("finale-title").textContent=CONFIG.finale.title;
+  document.getElementById("finale-body").textContent=CONFIG.finale.body;
+  document.getElementById("finale-sig").textContent="— "+CONFIG.senderName+" ❤️";
+  const n=CONFIG.loveNotes;
+  if(n[0]){document.getElementById("recap-mint-name").textContent=n[0].title;document.getElementById("recap-mint-msg").textContent=n[0].message;document.getElementById("recap-mint-ic").innerHTML=scoopSVG("mint");}
+  if(n[1]){document.getElementById("recap-berry-name").textContent=n[1].title;document.getElementById("recap-berry-msg").textContent=n[1].message;document.getElementById("recap-berry-ic").innerHTML=scoopSVG("strawberry");}
+  if(n[2]){document.getElementById("recap-van-name").textContent=n[2].title;document.getElementById("recap-van-msg").textContent=n[2].message;document.getElementById("recap-van-ic").innerHTML=scoopSVG("vanilla");}
+}
+
+let finaleRaf=0;
+function startFinaleConfetti() {
+  const canvas=DOM.finaleCanvas, section=document.getElementById("s-finale");
+  if (!canvas||window.matchMedia("(prefers-reduced-motion:reduce)").matches) return;
+  const rect=section.getBoundingClientRect(), dpr=window.devicePixelRatio||1;
+  canvas.width=rect.width*dpr; canvas.height=rect.height*dpr;
+  const ctx=canvas.getContext("2d"); ctx.scale(dpr,dpr);
+  const W=rect.width, H=rect.height;
+  const colors=["#FF8DA1","#A8E6CF","#FFF2B2","#D8B4FE","#FFD1DC","#FF5376","#A7F3D0"];
+  const syms=["❤️","🌸","✨","💕","🍦"];
+  const pieces=Array.from({length:55},()=>({
+    x:Math.random()*W, y:Math.random()*-H,
+    vx:(Math.random()-.5)*80, vy:60+Math.random()*130,
+    rot:Math.random()*Math.PI*2, rotV:(Math.random()-.5)*4,
+    size:7+Math.random()*9, color:colors[Math.floor(Math.random()*colors.length)],
+    sym:Math.random()<.35?syms[Math.floor(Math.random()*syms.length)]:null
+  }));
+  let lt=performance.now();
+  function loop(now) {
+    const dt=Math.min((now-lt)/1000,.1); lt=now;
+    ctx.clearRect(0,0,W,H);
+    let any=false;
+    for (const p of pieces) {
+      p.y+=p.vy*dt; p.x+=p.vx*dt; p.rot+=p.rotV*dt;
+      if(p.y<H+20) any=true;
+      ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.rot);
+      ctx.globalAlpha=Math.min(1,Math.min(p.y/60,(H-p.y)/80+.3));
+      if(p.sym){ctx.font=`${p.size*1.8}px sans-serif`;ctx.textAlign="center";ctx.textBaseline="middle";ctx.fillText(p.sym,0,0);}
+      else{ctx.fillStyle=p.color;ctx.beginPath();ctx.ellipse(0,0,p.size*.5,p.size,0,0,Math.PI*2);ctx.fill();}
+      ctx.restore();
+    }
+    if(any) finaleRaf=requestAnimationFrame(loop);
+    else ctx.clearRect(0,0,W,H);
+  }
+  if(finaleRaf) cancelAnimationFrame(finaleRaf);
+  finaleRaf=requestAnimationFrame(loop);
+}
+
+/* ==========================================================================
+ * COUPON BOOK
+ * ======================================================================== */
+function renderCoupons() {
+  DOM.cpnList.innerHTML="";
+  CONFIG.coupons.forEach(cpn=>{
+    const red=State.redeemedCoupons.has(cpn.id);
+    const card=document.createElement("div");
+    card.className=`cpn-card${red?" redeemed":""}`;
+
+    const actionHTML = red
+      ? `<div class="redeemed-stamp">✓ REDEEMED</div>
+         <button class="btn-revisit" data-cpn-id="${cpn.id}" data-cpn-type="${cpn.type}">RE-OPEN ▶</button>`
+      : `<button class="btn-redeem" data-cpn-id="${cpn.id}" data-cpn-type="${cpn.type}">REDEEM NOW ✨</button>`;
+
+    card.innerHTML=`
+      <div class="cpn-top">
+        <div class="cpn-icon" aria-hidden="true">${cpn.icon}</div>
+        <div class="cpn-info">
+          <div class="cpn-badge">${cpn.badge}</div>
+          <h3>${cpn.title}</h3>
+          <p>${cpn.description}</p>
+        </div>
+      </div>
+      <div class="cpn-row">${actionHTML}</div>`;
+    DOM.cpnList.appendChild(card);
+  });
+
+  DOM.cpnList.querySelectorAll("[data-cpn-id]").forEach(btn=>{
+    btn.addEventListener("click",()=>{
+      Sound.tap();
+      const id=btn.getAttribute("data-cpn-id");
+      const cpn=CONFIG.coupons.find(c=>c.id===id);
+      if (!cpn) return;
+      openCouponExperience(cpn);
+    });
+  });
+}
+
+function openCouponExperience(cpn) {
+  if (cpn.type==="lick") {
+    switchScreen("LICK");
+  } else if (cpn.type==="video") {
+    // Mark redeemed on opening
+    State.redeemedCoupons.add(cpn.id);
+    switchScreen(cpn.id==="movie" ? "MOVIE" : "HUG");
+  } else if (cpn.type==="form") {
+    switchScreen("CHOICE");
+  }
+}
+
+/* ==========================================================================
+ * LICK SCREEN — Triple Scoop Ice Cream Lick Game
+ * ======================================================================== */
+function initLickScreen() {
+  // Reset state
+  LickState.lickProgress  = [0,0,0];
+  LickState.scoopAlpha    = [1,1,1];
+  LickState.scoopGone     = [false,false,false];
+  LickState.totalGone     = 0;
+  LickState.lastPos       = null;
+  LickState.isActive      = false;
+  LickState.allDone       = false;
+  LickState.particles     = [];
+
+  const canvas = DOM.lickCanvas;
+  canvas.width  = LICK_W;
+  canvas.height = LICK_H;
+  lickCtx = canvas.getContext("2d");
+
+  // Create one offscreen canvas per scoop, draw each scoop onto it
+  lickScoopCanvases = LICK_SCOOPS.map(sc=>{
+    const oc  = document.createElement("canvas");
+    oc.width  = LICK_W;
+    oc.height = LICK_H;
+    const oc2 = oc.getContext("2d");
+    drawScoopOnCanvas(oc2, sc);
+    return oc;
+  });
+
+  // Bind pointer events
+  canvas.onpointermove  = onLickMove;
+  canvas.onpointerdown  = e=>{ LickState.isActive=true; LickState.lastPos=null; onLickMove(e); };
+  canvas.onpointerup    = ()=>{ LickState.isActive=false; LickState.lastPos=null; };
+  canvas.onpointercancel= ()=>{ LickState.isActive=false; LickState.lastPos=null; };
+
+  // Reset UI
+  document.getElementById("lick-hint").textContent="Swipe your finger to lick! 👅🍦";
+  document.getElementById("lick-progress-fill").style.width="0%";
+  document.getElementById("lick-done-area").style.display="none";
+  document.getElementById("btn-lick-back2").style.display="flex";
+}
+
+function drawScoopOnCanvas(ctx, sc) {
+  // Only draw the scoop, not the cone (cone is drawn separately on main canvas)
+  ctx.clearRect(0,0,LICK_W,LICK_H);
+  ctx.save();
+  // Scoop body
+  ctx.beginPath(); ctx.arc(sc.cx, sc.cy, sc.r, 0, Math.PI*2);
+  ctx.fillStyle = sc.color; ctx.fill();
+  // Shine highlight
+  ctx.beginPath(); ctx.arc(sc.cx-sc.r*.3, sc.cy-sc.r*.3, sc.r*.25, 0, Math.PI*2);
+  ctx.fillStyle="rgba(255,255,255,0.55)"; ctx.fill();
+  // Flavor details
+  if (sc.id==="mint") {
+    ctx.fillStyle="#3D2B1F";
+    [[sc.cx-sc.r*.3, sc.cy-sc.r*.2],[sc.cx+sc.r*.2, sc.cy-sc.r*.1],[sc.cx-sc.r*.05, sc.cy+sc.r*.25]].forEach(([x,y])=>{
+      ctx.beginPath(); ctx.ellipse(x,y,4,2.5,.5,0,Math.PI*2); ctx.fill();
+    });
+  } else if (sc.id==="strawberry") {
+    // Cherry on top
+    ctx.fillStyle="#FF1E44"; ctx.beginPath(); ctx.arc(sc.cx, sc.cy-sc.r*.85, 6, 0, Math.PI*2); ctx.fill();
+    ctx.strokeStyle="#D90029"; ctx.lineWidth=1.5; ctx.stroke();
+    ctx.strokeStyle="#4A7C59"; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(sc.cx,sc.cy-sc.r*.85-6); ctx.lineTo(sc.cx+5,sc.cy-sc.r*.85-12); ctx.stroke();
+    // Smile
+    ctx.strokeStyle="rgba(255,255,255,0.6)"; ctx.lineWidth=2.5;
+    ctx.beginPath(); ctx.arc(sc.cx, sc.cy, sc.r*.5, 0.15, Math.PI-.15); ctx.stroke();
+  } else if (sc.id==="vanilla") {
+    ctx.fillStyle="#D97706"; ctx.font="bold 20px sans-serif"; ctx.textAlign="center"; ctx.textBaseline="middle";
+    ctx.fillText("⚡", sc.cx, sc.cy);
+  }
+  ctx.restore();
+}
+
+function getLickCoords(e) {
+  const rect = DOM.lickCanvas.getBoundingClientRect();
+  return {
+    x: (e.clientX-rect.left) * (LICK_W/rect.width),
+    y: (e.clientY-rect.top)  * (LICK_H/rect.height)
+  };
+}
+
+function onLickMove(e) {
+  if (!LickState.isActive || LickState.allDone) return;
+  e.preventDefault();
+  const pos = getLickCoords(e);
+
+  LICK_SCOOPS.forEach((sc,i)=>{
+    if (LickState.scoopGone[i]) return;
+    const dist = Math.hypot(pos.x-sc.cx, pos.y-sc.cy);
+    if (dist < sc.r + LICK_BRUSH*.5) {
+      // Apply erasure to offscreen canvas
+      const oc = lickScoopCanvases[i].getContext("2d");
+      oc.globalCompositeOperation="destination-out";
+      oc.beginPath(); oc.arc(pos.x, pos.y, LICK_BRUSH, 0, Math.PI*2); oc.fill();
+      oc.globalCompositeOperation="source-over";
+
+      // Track progress
+      if (LickState.lastPos) {
+        const moved = Math.hypot(pos.x-LickState.lastPos.x, pos.y-LickState.lastPos.y);
+        if (moved > 2) LickState.lickProgress[i] += moved;
+      }
+
+      // Sparkle particles
+      if (Math.random()<.35) {
+        LickState.particles.push({
+          x:pos.x+(Math.random()-.5)*20,
+          y:pos.y+(Math.random()-.5)*20,
+          vx:(Math.random()-.5)*60,
+          vy:-30-Math.random()*50,
+          color:sc.color,
+          size:3+Math.random()*3,
+          life:.5, maxLife:.5, isHeart:Math.random()<.2
+        });
+      }
+
+      // Check eaten
+      if (!LickState.scoopGone[i] && LickState.lickProgress[i] >= LICK_THRESHOLD) {
+        LickState.scoopGone[i] = true;
+        LickState.totalGone++;
+        spawnLickBurst(sc.cx, sc.cy, sc.color);
+        Sound.chime();
+        updateLickHint();
+        if (LickState.totalGone >= 3) {
+          LickState.allDone = true;
+          State.redeemedCoupons.add("icecream");
+          setTimeout(showLickDone, 500);
+        }
+      }
+    }
+  });
+
+  LickState.lastPos = pos;
+}
+
+function spawnLickBurst(x, y, color) {
+  for (let i=0;i<22;i++) {
+    const ang=Math.random()*Math.PI*2, spd=30+Math.random()*100;
+    LickState.particles.push({
+      x,y,vx:Math.cos(ang)*spd,vy:Math.sin(ang)*spd,
+      color:i%2===0?color:"#FF5376",size:3+Math.random()*5,
+      life:.8+Math.random()*.4,maxLife:1.2,isHeart:(i%4===0)
+    });
+  }
+}
+
+function updateLickHint() {
+  const left = 3 - LickState.totalGone;
+  const hints = ["Swipe your finger to lick! 👅🍦","Yummy! 2 scoops left! 😋","One more! Almost there! 🤤",""];
+  document.getElementById("lick-hint").textContent = hints[LickState.totalGone] || "";
+  // Update progress bar
+  const pct = Math.min(100, (LickState.lickProgress.reduce((a,b)=>a+b,0) / (LICK_THRESHOLD*3))*100);
+  document.getElementById("lick-progress-fill").style.width = pct+"%";
+}
+
+function showLickDone() {
+  document.getElementById("lick-hint").textContent="";
+  document.getElementById("lick-progress-fill").style.width="100%";
+  const area = document.getElementById("lick-done-area");
+  area.style.display="flex";
+  document.getElementById("btn-lick-back2").style.display="none";
+  Sound.fanfare();
+}
+
+function startLickLoop() {
+  if (lickRaf) cancelAnimationFrame(lickRaf);
+  let lt = performance.now();
+
+  function loop(now) {
+    if (State.screen !== "LICK") return;
+    const dt = Math.min((now-lt)/1000,.1); lt=now;
+
+    // Update alphas (fade out eaten scoops)
+    LICK_SCOOPS.forEach((_,i)=>{
+      if (LickState.scoopGone[i] && LickState.scoopAlpha[i] > 0) {
+        LickState.scoopAlpha[i] -= dt*2.5;
+        if (LickState.scoopAlpha[i]<0) LickState.scoopAlpha[i]=0;
+      }
+    });
+
+    // Update particles
+    for (let i=LickState.particles.length-1;i>=0;i--) {
+      const p=LickState.particles[i];
+      p.life-=dt; p.x+=p.vx*dt; p.y+=p.vy*dt;
+      if (p.life<=0) LickState.particles.splice(i,1);
+    }
+
+    // Update progress bar (continuous)
+    if (!LickState.allDone) {
+      const pct=Math.min(100,(LickState.lickProgress.reduce((a,b)=>a+b,0)/(LICK_THRESHOLD*3))*100);
+      document.getElementById("lick-progress-fill").style.width=pct+"%";
+    }
+
+    drawLickScene();
+    lickRaf = requestAnimationFrame(loop);
+  }
+  lickRaf = requestAnimationFrame(loop);
+}
+
+function drawLickScene() {
+  if (!lickCtx) return;
+  const ctx=lickCtx;
+  ctx.clearRect(0,0,LICK_W,LICK_H);
+
+  // Background
+  const grad=ctx.createLinearGradient(0,0,0,LICK_H);
+  grad.addColorStop(0,"#FFF0F5"); grad.addColorStop(1,"#FFE4E8");
+  ctx.fillStyle=grad; ctx.fillRect(0,0,LICK_W,LICK_H);
+
+  // Decorative dots
+  ctx.fillStyle="rgba(255,182,193,0.25)";
+  [[30,30],[LICK_W-30,30],[30,LICK_H-30],[LICK_W-30,LICK_H-30]].forEach(([x,y])=>{
+    ctx.beginPath(); ctx.arc(x,y,18,0,Math.PI*2); ctx.fill();
+  });
+
+  // Draw cone (static behind scoops)
+  drawLickCone(ctx);
+
+  // Draw scoops from offscreen canvases (bottom to top: vanilla, strawberry, mint)
+  for (let i=0;i<3;i++) {
+    if (LickState.scoopAlpha[i]<=0) continue;
+    ctx.save();
+    ctx.globalAlpha = LickState.scoopAlpha[i];
+    ctx.drawImage(lickScoopCanvases[i], 0, 0, LICK_W, LICK_H);
+    ctx.restore();
+  }
+
+  // Particles
+  drawParticles(ctx, LickState.particles);
+
+  // "Lick me" prompt (pulsing arrow if not started yet)
+  if (LickState.totalGone===0 && !LickState.isActive) {
+    const t=performance.now()*.003;
+    ctx.save();
+    ctx.globalAlpha=0.5+Math.sin(t*2)*.3;
+    ctx.font="bold 14px sans-serif"; ctx.fillStyle=var_pink_deep;
+    ctx.textAlign="center"; ctx.textBaseline="middle";
+    ctx.fillText("👆 Swipe here!", LICK_W/2, LICK_SCOOPS[2].cy+LICK_SCOOPS[2].r+22);
+    ctx.restore();
+  }
+}
+
+const var_pink_deep="#E03157";
+
+function drawLickCone(ctx) {
+  // Waffle cone
+  const cx=LICK_W/2, coneTop=LICK_SCOOPS[0].cy+LICK_SCOOPS[0].r-4;
+  const coneBtm=LICK_H-20;
+  const coneW=60;
+  ctx.save();
+  // Cone body
+  ctx.beginPath();
+  ctx.moveTo(cx-coneW/2, coneTop);
+  ctx.lineTo(cx+coneW/2, coneTop);
+  ctx.lineTo(cx, coneBtm);
+  ctx.closePath();
+  const cg=ctx.createLinearGradient(cx-coneW/2,coneTop,cx+coneW/2,coneBtm);
+  cg.addColorStop(0,"#F4C47A"); cg.addColorStop(1,"#D99E4B");
+  ctx.fillStyle=cg; ctx.fill();
+  ctx.strokeStyle="#C4852A"; ctx.lineWidth=1.5; ctx.stroke();
+  // Waffle grid lines
+  ctx.strokeStyle="rgba(160,100,20,0.35)"; ctx.lineWidth=1;
+  for (let row=1;row<5;row++) {
+    const fy=coneTop+(coneBtm-coneTop)*row/5;
+    const w=coneW*(1-row/5);
+    ctx.beginPath(); ctx.moveTo(cx-w/2,fy); ctx.lineTo(cx+w/2,fy); ctx.stroke();
+  }
+  for (let col=1;col<4;col++) {
+    ctx.beginPath();
+    const topX=cx-coneW/2+coneW*col/4;
+    ctx.moveTo(topX,coneTop); ctx.lineTo(cx,coneBtm); ctx.stroke();
+  }
+  // Drips (cute detail)
+  ctx.fillStyle="#FFF2B2";
+  ctx.beginPath(); ctx.ellipse(cx-8, coneTop+3, 7, 10, -0.3, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle="#FF8DA1";
+  ctx.beginPath(); ctx.ellipse(cx+10, coneTop+2, 6, 8, 0.4, 0, Math.PI*2); ctx.fill();
+  ctx.restore();
+}
+
+document.getElementById("btn-lick-back").addEventListener("click",()=>{ Sound.tap(); switchScreen("COUPONS"); });
+document.getElementById("btn-lick-back2").addEventListener("click",()=>{ Sound.tap(); switchScreen("COUPONS"); });
+
+/* ==========================================================================
+ * VIDEO SCREENS (Movie + Hug)
+ * ======================================================================== */
+function initVideoScreen(which) {
+  const vid     = document.getElementById(`${which}-vid`);
+  const fallback= document.getElementById(`${which}-fallback`);
+  const overlay = document.getElementById(`${which}-overlay`);
+  const playBtn = document.getElementById(`${which}-play-btn`);
+
+  // Show fallback if error
+  vid.onerror=()=>{ vid.style.display="none"; fallback.style.display="flex"; overlay.style.display="none"; };
+
+  // Test if file exists (will fire onerror if not)
+  vid.load();
+
+  function syncPlayBtn() {
+    playBtn.textContent = vid.paused ? "▶" : "⏸";
+    playBtn.classList.toggle("hidden", !vid.paused);
+    overlay.classList.toggle("dim", !vid.paused);
+  }
+
+  overlay.onclick=()=>{
+    if (vid.paused) { vid.play().catch(()=>{}); }
+    else            { vid.pause(); }
+  };
+
+  vid.addEventListener("play",    syncPlayBtn);
+  vid.addEventListener("pause",   syncPlayBtn);
+  vid.addEventListener("ended",   syncPlayBtn);
+  vid.addEventListener("canplay", ()=>{ vid.style.display="block"; fallback.style.display="none"; });
+
+  syncPlayBtn();
+}
+
+function setupFullscreen(vidId, btnId) {
+  const btn=document.getElementById(btnId);
+  const vid=document.getElementById(vidId);
+  if (!btn||!vid) return;
+  btn.addEventListener("click",()=>{
+    const el=vid;
+    (el.requestFullscreen||el.webkitRequestFullscreen||el.mozRequestFullScreen||el.msRequestFullscreen||
+     (()=>{})).call(el);
+  });
+}
+setupFullscreen("movie-vid","movie-fs-btn");
+setupFullscreen("hug-vid",  "hug-fs-btn");
+
+document.getElementById("btn-movie-back").addEventListener("click",()=>{ Sound.tap(); document.getElementById("movie-vid").pause(); switchScreen("COUPONS"); });
+document.getElementById("btn-hug-back").addEventListener("click",()=>{   Sound.tap(); document.getElementById("hug-vid").pause();   switchScreen("COUPONS"); });
+
+/* ==========================================================================
+ * CHOICE DAY FORM + CANVAS PNG EXPORT
+ * ======================================================================== */
+document.getElementById("btn-choice-submit").addEventListener("click", ()=>{
+  Sound.tap();
+  const todo   = (document.getElementById("f-todo").value   || "").trim();
+  const where  = (document.getElementById("f-where").value  || "").trim();
+  const eat    = (document.getElementById("f-eat").value    || "").trim();
+  const wishes = (document.getElementById("f-wishes").value || "").trim();
+
+  if (!todo && !where && !eat && !wishes) {
+    document.getElementById("f-todo").focus();
+    document.getElementById("f-todo").style.borderColor="#FF5376";
+    setTimeout(()=>document.getElementById("f-todo").style.borderColor="",2000);
+    return;
+  }
+
+  // Mark redeemed
+  State.redeemedCoupons.add("choice");
+
+  // Build the PNG card on a canvas
+  const cardW=640, cardH=820;
+  const oc=document.createElement("canvas"); oc.width=cardW; oc.height=cardH;
+  const c=oc.getContext("2d");
+
+  // Background gradient
+  const bg=c.createLinearGradient(0,0,cardW,cardH);
+  bg.addColorStop(0,"#FFF0F5"); bg.addColorStop(.5,"#FFE4E8"); bg.addColorStop(1,"#F5E8FF");
+  c.fillStyle=bg; c.fillRect(0,0,cardW,cardH);
+
+  // Pink border
+  c.strokeStyle="#FFB6C1"; c.lineWidth=8;
+  c.strokeRect(16,16,cardW-32,cardH-32);
+  c.strokeStyle="rgba(255,182,193,.4)"; c.lineWidth=3;
+  c.strokeRect(26,26,cardW-52,cardH-52);
+
+  // Corner flowers (simple)
+  const fc=[[40,40],[cardW-40,40],[40,cardH-40],[cardW-40,cardH-40]];
+  const fcolors=["#FF8DA1","#A8E6CF","#FFF2B2","#D8B4FE"];
+  fc.forEach(([x,y],fi)=>{
+    c.fillStyle=fcolors[fi];
+    for(let i=0;i<5;i++){const a=(i*Math.PI*2)/5;c.beginPath();c.arc(x+Math.cos(a)*10,y+Math.sin(a)*10,7,0,Math.PI*2);c.fill();}
+    c.fillStyle="#FFF9E6"; c.beginPath(); c.arc(x,y,5,0,Math.PI*2); c.fill();
+  });
+
+  // Title
+  c.fillStyle="#E03157";
+  c.font="bold 44px -apple-system, BlinkMacSystemFont, Arial, sans-serif";
+  c.textAlign="center"; c.textBaseline="middle";
+  c.fillText("My Perfect Day ✨", cardW/2, 90);
+
+  // Divider
+  c.fillStyle="#FFB6C1"; c.fillRect(80,120,cardW-160,3); c.fillRect(80,126,cardW-160,1);
+
+  // Fields
+  const fields=[
+    {icon:"🎯",label:"What I want to do:",val:todo},
+    {icon:"📍",label:"Where I want to go:",val:where},
+    {icon:"🍽️",label:"What I want to eat:",val:eat},
+    {icon:"💕",label:"My special wishes:",val:wishes}
+  ];
+
+  let yy=156;
+  fields.forEach(f=>{
+    if (!f.val) { f.val="(not specified)"; }
+
+    // Field box
+    const bh=Math.min(140, 60+Math.ceil(f.val.length/36)*22);
+    c.fillStyle="rgba(255,255,255,0.85)";
+    c.beginPath(); c.roundRect(48, yy, cardW-96, bh, 14); c.fill();
+    c.strokeStyle="rgba(255,182,193,0.6)"; c.lineWidth=2;
+    c.stroke();
+
+    // Icon + label
+    c.font="22px sans-serif"; c.textAlign="left"; c.textBaseline="middle";
+    c.fillText(f.icon, 68, yy+20);
+    c.fillStyle="#E03157";
+    c.font="bold 17px -apple-system, BlinkMacSystemFont, Arial, sans-serif";
+    c.fillText(f.label, 98, yy+20);
+
+    // Value (word wrap)
+    c.fillStyle="#4A333B";
+    c.font="18px -apple-system, BlinkMacSystemFont, Arial, sans-serif";
+    const words=f.val.split(" "), maxW=cardW-140, lineH=24;
+    let line="", ly=yy+46;
+    for (const w of words) {
+      const test=line?line+" "+w:w;
+      if (c.measureText(test).width>maxW && line) {
+        c.fillText(line, 68, ly); line=w; ly+=lineH;
+      } else { line=test; }
+    }
+    if (line) c.fillText(line, 68, ly);
+
+    yy+=bh+14;
+  });
+
+  // Bottom divider
+  c.fillStyle="#FFB6C1"; c.fillRect(80,yy+10,cardW-160,3);
+
+  // Signature
+  c.fillStyle="#E03157";
+  c.font="bold 32px -apple-system, BlinkMacSystemFont, Arial, sans-serif";
+  c.textAlign="center"; c.textBaseline="middle";
+  c.fillText("From Your Queen 👑", cardW/2, yy+50);
+
+  // Date
+  c.fillStyle="#7E636D";
+  c.font="16px -apple-system, BlinkMacSystemFont, Arial, sans-serif";
+  const now=new Date();
+  c.fillText(now.toLocaleDateString("en-GB",{day:"numeric",month:"long",year:"numeric"}), cardW/2, yy+80);
+
+  // Heart decoration
+  c.font="28px sans-serif"; c.textBaseline="middle";
+  c.fillText("❤️", cardW/2-60, yy+125);
+  c.fillText("❤️", cardW/2+60, yy+125);
+
+  // Convert to downloadable link
+  const dataURL=oc.toDataURL("image/png");
+  const link=document.getElementById("choice-dl-link");
+  link.href=dataURL;
+
+  // Show download area
+  const dlArea=document.getElementById("choice-download");
+  dlArea.style.display="flex";
+  dlArea.scrollIntoView({behavior:"smooth",block:"nearest"});
+  Sound.fanfare();
+});
+
+document.getElementById("btn-choice-back").addEventListener("click",()=>{
+  Sound.tap();
+  // Reset form
+  ["f-todo","f-where","f-eat","f-wishes"].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.value="";
+  });
+  document.getElementById("choice-download").style.display="none";
+  switchScreen("COUPONS");
+});
+
+/* ==========================================================================
+ * NAVIGATION BUTTONS
+ * ======================================================================== */
+document.getElementById("btn-start").addEventListener("click",()=>{ Sound.tap(); Sound.init(); State.reset(); switchScreen("GAME"); });
+document.getElementById("btn-home").addEventListener("click",()=>{
+  Sound.tap();
+  if(finaleRaf){cancelAnimationFrame(finaleRaf);finaleRaf=0;}
+  switchScreen("HERO");
+});
+document.getElementById("btn-sound").addEventListener("click",()=>Sound.toggleMusic());
+document.getElementById("btn-open-coupons").addEventListener("click",()=>{ Sound.tap(); switchScreen("COUPONS"); });
+document.getElementById("btn-finale-replay").addEventListener("click",()=>{
+  Sound.tap();
+  if(finaleRaf){cancelAnimationFrame(finaleRaf);finaleRaf=0;}
+  State.reset(); switchScreen("GAME");
+});
+document.getElementById("btn-back-finale").addEventListener("click",()=>{ Sound.tap(); switchScreen("FINALE"); });
+document.getElementById("btn-coupons-play").addEventListener("click",()=>{ Sound.tap(); State.reset(); switchScreen("GAME"); });
+
+/* ==========================================================================
+ * FLOATING HEARTS
+ * ======================================================================== */
+function initHearts() {
+  const c=document.getElementById("hearts-bg");
+  const s=["❤️","💖","💕","🌸","✨","🍬","🌷"];
+  for(let i=0;i<16;i++){
+    const el=document.createElement("span"); el.className="fheart";
+    el.textContent=s[i%s.length];
+    el.style.left=(Math.random()*90+5)+"%";
+    el.style.animationDelay=(Math.random()*11)+"s";
+    el.style.animationDuration=(8+Math.random()*8)+"s";
+    c.appendChild(el);
+  }
+}
+
+/* ==========================================================================
+ * APPLY CONFIG TO DOM
+ * ======================================================================== */
+function applyConfig() {
+  document.getElementById("brand-name").textContent="Sweet Ride ❤️";
+  document.getElementById("hero-badge").textContent=CONFIG.heroBadge;
+  document.getElementById("hero-title").textContent=CONFIG.heroTitle;
+  document.getElementById("hero-sub").textContent=CONFIG.subtitle;
+  document.getElementById("hero-hint").textContent=CONFIG.heroHint;
+  document.getElementById("btn-start").firstChild.textContent=CONFIG.startBtn;
+  document.title=CONFIG.heroTitle;
+}
+
+/* ==========================================================================
+ * INIT
+ * ======================================================================== */
+function init() {
+  applyConfig();
+  initHearts();
+  resizeCanvas();
+  lastTime=performance.now();
+  requestAnimationFrame(gameLoop);
+}
+
+if (document.readyState==="loading") document.addEventListener("DOMContentLoaded",init);
+else init();
+</script>
+</body>
+</html>
